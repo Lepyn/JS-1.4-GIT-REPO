@@ -1,17 +1,31 @@
 const search = document.querySelector("input");
 
-function getRepo(value) {
-  let arrRepo = [];
-  fetch(`https://api.github.com/search/repositories?q=${value}&per_page=5`)
-    .then((response) => {
-      return response.json();
-    })
-    .then((el) => {
-      arrRepo.push(...el.items);
-      promptSearch(arrRepo);
-    })
-    .catch((err) => console.log(`Ошибка получения данных - ${err}`));
-}
+
+let userName;
+let userOwner;
+let userStars;
+
+async function getRepo(value) {
+    try {  
+  const response = await fetch(`https://api.github.com/search/repositories?q=${value}&per_page=5`)
+        const responseJSON = await response.json()
+        search.innerHTML = ''
+       const responseUser = responseJSON.items.forEach((i) => { 
+            const fragment = new DocumentFragment();
+            const promtItem = document.createElement("li");
+            promtItem.classList.add("promptItem");
+            userName = promtItem.textContent = i.name;
+            userOwner = i.owner.login;
+            userStars = i.stargazers_count;
+            fragment.append(promtItem);
+            return promtCard.append(fragment);
+    });
+       } catch (e) { 
+         console.log('Ошибка!');
+     }    
+  }
+ 
+ 
 
 function changeHandler(e) {
   deletePromptList();
@@ -34,25 +48,23 @@ search.addEventListener("input", debaunceChangeHandler);
 
 const promtCard = document.querySelector(".promptCard");
 
-function promptSearch(arr) {
-  const fragment = new DocumentFragment();
-  arr.forEach((dataUser) => {
-    const promtItem = document.createElement("li");
-    promtItem.classList.add("promptItem");
-    userName = promtItem.textContent = dataUser.name;
-    userOwner = dataUser.owner.login;
-    userStars = dataUser.stargazers_count;
-    fragment.append(promtItem);
-  });
-  return promtCard.append(fragment);
-}
+// function promptSearch(arr) {
+//   const fragment = new DocumentFragment();
+//   arr.forEach((dataUser) => {
+//     const promtItem = document.createElement("li");
+//     promtItem.classList.add("promptItem");
+//     userName = promtItem.textContent = dataUser.name;
+//     userOwner = dataUser.owner.login;
+//     userStars = dataUser.stargazers_count;
+//     fragment.append(promtItem);
+//   });
+//   return promtCard.append(fragment);
+// }
 
 const createForList = document.querySelector(".list");
 createForList.classList.add("list");
 
-let userName;
-let userOwner;
-let userStars;
+ 
 
 function card(name, owner, stars) {
   name = userName;
@@ -64,17 +76,17 @@ function card(name, owner, stars) {
   const user = document.createElement("span");
   user.classList.add("info-item");
 
-  const cardName = document.createElement("p");
+  const cardName = document.createElement("div");
   cardName.classList.add("card-name");
   cardName.textContent = `Name: ${name}`;
   user.append(cardName);
 
-  const cardOwner = document.createElement("p");
+  const cardOwner = document.createElement("div");
   cardOwner.classList.add("card-owner");
   cardOwner.textContent = `Owner: ${owner} `;
   user.append(cardOwner);
 
-  const cardStars = document.createElement("p");
+  const cardStars = document.createElement("div");
   cardStars.classList.add("card-stars");
   cardStars.textContent = `Stars: ${stars} `;
   user.append(cardStars);
